@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio to Newsletter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Audio to Newsletter</h1>
+    <form id="uploadForm">
+        <input type="file" id="audioFile" name="audio" accept="audio/*" required><br><br>
+        <button type="submit">Transcribe</button>
+    </form>
+
+    <h3>Transcript</h3>
+    <pre id="transcript"></pre>
+
+    <h3>Summary</h3>
+    <pre id="summary"></pre>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const file = document.getElementById('audioFile').files[0];
+            formData.append('audio', file);
+
+            const response = await fetch('/transcribe', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('transcript').innerText = result.transcript || result.error;
+            document.getElementById('summary').innerText = result.summary || '';
+        };
+    </script>
+</body>
+</html>
